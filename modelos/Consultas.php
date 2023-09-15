@@ -27,7 +27,7 @@ public function totalcomprahoy(){
 
 	//local
 	$fecha_actual = date("Y-m-d"); 
-	$sql="SELECT IFNULL(SUM(total_compra), 0) as total_compra FROM ingreso WHERE  DATE(fecha_hora)='$fecha_actual'";
+	$sql="SELECT IFNULL(SUM(total_compra), 0) as total_compra FROM ingreso WHERE  DATE(fecha_hora)='$fecha_actual' AND estado='aceptado'";
 	return ejecutarConsulta($sql);
 }
 
@@ -36,7 +36,7 @@ public function totalventahoy(){
 	//$sql="SELECT IFNULL(SUM(total_venta),0) as total_venta FROM venta WHERE DATE(select fecha_hora FROM ingreso)=curdate()";
 	//local
 	$fecha_actual = date("Y-m-d"); 
-	$sql="SELECT IFNULL(SUM(total_venta),0) as total_venta FROM venta WHERE DATE(fecha_hora)='$fecha_actual'";
+	$sql="SELECT IFNULL(SUM(total_venta),0) as total_venta FROM venta WHERE DATE(fecha_hora)='$fecha_actual' AND estado='aceptado' ";
 	return ejecutarConsulta($sql);
 }
 

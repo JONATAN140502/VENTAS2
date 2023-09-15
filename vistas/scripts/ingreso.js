@@ -178,8 +178,9 @@ function anular(idingreso){
 	bootbox.confirm("¿Esta seguro de desactivar este dato?", function(result){
 		if (result) {
 			$.post("../ajax/ingreso.php?op=anular", {idingreso : idingreso}, function(e){
-				bootbox.alert(e);
 				tabla.ajax.reload();
+				bootbox.alert(e);
+				
 			});
 		}
 	})

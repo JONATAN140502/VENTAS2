@@ -43,7 +43,7 @@ switch ($_GET["op"]) {
 			$tipo=$_GET['tipo'];
 			$rspta=$venta->codigo($tipo);
 			echo ($rspta);
-			break;
+			break; 
 
 	case 'listarDetalle':
 		//recibimos el idventa
@@ -78,7 +78,30 @@ switch ($_GET["op"]) {
          <th><h4 id="total">S/. '.$total.'</h4><input type="hidden" name="total_venta" id="total_venta"></th>
        </tfoot>';
 		break;
+		case 'listarDetalleEditar':
+			//recibimos el idventa
+			$id=$_GET['id'];
 
+			$rspta=$venta->listarDetalle($id);
+			$total=0;
+			$data=Array();
+			while ($reg=$rspta->fetch_object()) {
+				$data[]=array(
+					"0"=>$reg->id_articulo,
+					"1"=>$reg->nombre,
+					"2"=>$reg->cantidad,
+					"3"=>$reg->precio_venta,
+					"4"=>$reg->descuento,
+					"5"=>$reg->subtotal	,	
+				);
+			}
+			$results=array(
+				"sEcho"=>1,//info para datatables
+				"iTotalRecords"=>count($data),//enviamos el total de registros al datatable
+				"iTotalDisplayRecords"=>count($data),//enviamos el total de registros a visualizar
+				"aaData"=>$data); 
+		   echo json_encode($results);
+			break;
     case 'listar':
 		$rspta=$venta->listar();
 		$data=Array();
@@ -91,7 +114,11 @@ switch ($_GET["op"]) {
                  }
 
 			$data[]=array(
-            "0"=>(($reg->estado=='Aceptado')?'<button class="btn btn-warning btn-xs" onclick="mostrar('.$reg->idventa.')"><i class="fa fa-eye"></i></button>'.' '.'<button class="btn btn-danger btn-xs" onclick="anular('.$reg->idventa.')"><i class="fa fa-close"></i></button>':'<button class="btn btn-warning btn-xs" onclick="mostrar('.$reg->idventa.')"><i class="fa fa-eye"></i></button>').
+            "0"=>(($reg->estado=='Aceptado')?'<button class="btn btn-warning btn-xs" onclick="mostrar('.$reg->idventa.')">
+			<i class="fa fa-eye"></i></button>'.''.'<button class="btn btn-success btn-xs" onclick="mostrar('.$reg->idventa.')">
+			<i class="fa fa-pencil"></i></button>'.' '.'<button class="btn btn-danger btn-xs" onclick="anular('.$reg->idventa.')">
+			<i class="fa fa-close"></i></button>':'<button class="btn btn-warning btn-xs"
+			 onclick="mostrar('.$reg->idventa.')"><i class="fa fa-eye"></i></button>').
             '<a target="_blank" href="'.$url.$reg->idventa.'"> <button class="btn btn-info btn-xs"><i class="fa fa-file"></i></button></a>',
             "1"=>$reg->fecha,
             "2"=>$reg->cliente,

@@ -31,7 +31,7 @@ if ($_SESSION['ventas']==1) {
 <div class="panel-body table-responsive" id="listadoregistros">
   <table id="tbllistado" class="table table-striped table-bordered table-condensed table-hover">
     <thead>
-      <th>Opciones</th>
+      <th class="text-center">Opciones</th>
       <th>Fecha</th>
       <th>Cliente</th>
       <th>Usuario</th>
@@ -105,7 +105,7 @@ if ($_SESSION['ventas']==1) {
         <th>Descuento</th>
         <th>Subtotal</th>
        </thead>
-       <tfoot>
+       <tfoot> 
          <th>TOTAL</th>
          <th></th>
          <th></th>

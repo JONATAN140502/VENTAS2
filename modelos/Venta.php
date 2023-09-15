@@ -42,7 +42,7 @@ public function mostrar($idventa){
 public function listarDetalle($idventa){
 	$sql="SELECT dv.idventa,dv.idarticulo,a.nombre,dv.cantidad,dv.precio_venta,dv.descuento,(dv.cantidad*dv.precio_venta-dv.descuento) as subtotal FROM detalle_venta dv INNER JOIN articulo a ON dv.idarticulo=a.idarticulo WHERE dv.idventa='$idventa'";
 	return ejecutarConsulta($sql);
-}
+} 
  
 //listar registros
 public function listar(){
@@ -73,7 +73,7 @@ public function ventacabecera($idventa){
 // }
 
 public function ventadetalles($idventa){
-	$sql="SELECT a.nombre AS articulo, a.codigo, d.cantidad, d.precio_venta, d.descuento, (d.cantidad*d.precio_venta-d.descuento) AS subtotal FROM detalle_venta d INNER JOIN articulo a ON d.idarticulo=a.idarticulo WHERE d.idventa='$idventa'";
+	$sql="SELECT a.nombre AS articulo, a.codigo,a.idarticulo as id_articulo, d.cantidad, d.precio_venta, d.descuento, (d.cantidad*d.precio_venta-d.descuento) AS subtotal FROM detalle_venta d INNER JOIN articulo a ON d.idarticulo=a.idarticulo WHERE d.idventa='$idventa'";
          return ejecutarConsulta($sql);
 }
 // public function ventadetalles($idventa){
