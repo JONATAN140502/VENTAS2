@@ -26,7 +26,29 @@ public function insertar($idproveedor,$idusuario,$tipo_comprobante,$serie_compro
 	 }
 	 return $sw;
 }
+//metodo insertar registro
+public function editar($idingreso,$idproveedor,$idusuario,$tipo_comprobante,$serie_comprobante,$num_comprobante,$fecha_hora,$impuesto,$total_compra,$idarticulo,$cantidad,$precio_compra,$precio_venta){
+	$sql="UPDATE ingreso  SET idproveedor='$idproveedor',idusuario='$idusuario',
+	tipo_comprobante='$tipo_comprobante' ,serie_comprobante='$serie_comprobante' ,
+	num_comprobante='$num_comprobante' ,fecha_hora='$fecha_hora' ,impuesto='$impuesto' 
+	,total_compra='$total_compra' ,estado='Aceptado' WHERE idingreso='$idingreso'";
+	//return ejecutarConsulta($sql);
+	 ejecutarConsulta($sql);
+	 $sql2=" DELETE FROM detalle_ingreso WHERE idingreso='$idingreso'";
+	 ejecutarConsulta($sql2);
+	 $num_elementos=0;
+	 $sw=true;
+	 while ($num_elementos < count($idarticulo)) {
 
+	 	$sql_detalle="INSERT INTO detalle_ingreso (idingreso,idarticulo,cantidad,precio_compra,precio_venta)
+		 VALUES('$idingreso','$idarticulo[$num_elementos]','$cantidad[$num_elementos]','$precio_compra[$num_elementos]','$precio_venta[$num_elementos]')";
+
+	 	ejecutarConsulta($sql_detalle) or $sw=false;
+
+	 	$num_elementos=$num_elementos+1;
+	 }
+	 return $sw;
+}
 public function anular($idingreso){
 	$sql="UPDATE ingreso SET estado='Anulado' WHERE idingreso='$idingreso'";
 	return ejecutarConsulta($sql);

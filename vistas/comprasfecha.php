@@ -8,7 +8,7 @@ if (!isset($_SESSION['nombre'])) {
 
 
 require 'header.php';
-
+date_default_timezone_set('America/Lima');
 if ($_SESSION['consultac']==1) {
 
  ?>

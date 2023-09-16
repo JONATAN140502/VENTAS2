@@ -22,7 +22,8 @@ switch ($_GET["op"]) {
 		$rspta=$ingreso->insertar($idproveedor,$idusuario,$tipo_comprobante,$serie_comprobante,$num_comprobante,$fecha_hora,$impuesto,$total_compra,$_POST["idarticulo"],$_POST["cantidad"],$_POST["precio_compra"],$_POST["precio_venta"]);
 		echo $rspta ? "Datos registrados correctamente" : "No se pudo registrar los datos";
 	}else{
-		
+		$rspta=$ingreso->editar($idingreso,$idproveedor,$idusuario,$tipo_comprobante,$serie_comprobante,$num_comprobante,$fecha_hora,$impuesto,$total_compra,$_POST["idarticulo"],$_POST["cantidad"],$_POST["precio_compra"],$_POST["precio_venta"]);
+		echo $rspta ? "Datos Editados correctamente" : "No se pudo Editar los datos";
         
 	}
 		break;
@@ -73,14 +74,38 @@ switch ($_GET["op"]) {
          <th><h4 id="total">S/. '.$total.'</h4><input type="hidden" name="total_compra" id="total_compra"></th>
        </tfoot>';
 		break;
+		case 'listarDetalleEditar':
+			//recibimos el idventa
+			$id=$_GET['id'];
 
+			$rspta=$ingreso->listarDetalle($id);
+			$total=0;
+			$data=Array();
+			while ($reg=$rspta->fetch_object()) {
+				$data[]=array(
+					"0"=>$reg->idarticulo,
+					"1"=>$reg->nombre,
+					"2"=>$reg->cantidad,
+					"3"=>$reg->precio_compra,
+					"4"=>$reg->precio_venta,
+					"5"=>$reg->cantidad*$reg->precio_compra,	
+				);
+			}
+			// $results=array(
+			// 	//enviamos el total de registros a visualizar
+			// 	"Data"=>$data); 
+		   echo json_encode($data);
+			break;
     case 'listar':
 		$rspta=$ingreso->listar();
 		$data=Array();
 
 		while ($reg=$rspta->fetch_object()) {
 			$data[]=array(
-            "0"=>($reg->estado=='Aceptado')?'<button class="btn btn-warning btn-xs" onclick="mostrar('.$reg->idingreso.')"><i class="fa fa-eye"></i></button>'.' '.'<button class="btn btn-danger btn-xs" onclick="anular('.$reg->idingreso.')"><i class="fa fa-close"></i></button>':'<button class="btn btn-warning btn-xs" onclick="mostrar('.$reg->idingreso.')"><i class="fa fa-eye"></i></button>',
+            "0"=>($reg->estado=='Aceptado')?'<button class="btn btn-warning btn-xs" onclick="mostrar('.$reg->idingreso.')"><i class="fa fa-eye">
+			</i></button>'.' '.'<button class="btn btn-success btn-xs" onclick="editar('.$reg->idingreso.')">
+			<i class="fa fa-pencil"></i></button>'.
+			' '.'<button class="btn btn-danger btn-xs" onclick="anular('.$reg->idingreso.')"><i class="fa fa-close"></i></button>':'<button class="btn btn-warning btn-xs" onclick="mostrar('.$reg->idingreso.')"><i class="fa fa-eye"></i></button>',
             "1"=>$reg->fecha,
             "2"=>$reg->proveedor,
             "3"=>$reg->usuario,

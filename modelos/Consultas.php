@@ -6,7 +6,7 @@ class Consultas{
 
 	//implementamos nuestro constructor
 public function __construct(){
-
+	date_default_timezone_set('America/Lima');
 }
 
 //listar registros
@@ -22,21 +22,14 @@ public function ventasfechacliente($fecha_inicio,$fecha_fin,$idcliente){
 }
 
 public function totalcomprahoy(){
-	//nube
-//$sql="SELECT IFNULL(SUM(total_compra), 0) as total_compra FROM ingreso WHERE (select fecha_hora FROM ingreso) = CURDATE()";
-
-	//local
 	$fecha_actual = date("Y-m-d"); 
-	$sql="SELECT IFNULL(SUM(total_compra), 0) as total_compra FROM ingreso WHERE  DATE(fecha_hora)='$fecha_actual' AND estado='aceptado'";
+	$sql="SELECT IFNULL(SUM(total_compra), 0) as total_compra FROM ingreso WHERE  DATE(fecha_hora)='$fecha_actual' AND estado='Aceptado'";
 	return ejecutarConsulta($sql);
 }
 
 public function totalventahoy(){
-	//nube
-	//$sql="SELECT IFNULL(SUM(total_venta),0) as total_venta FROM venta WHERE DATE(select fecha_hora FROM ingreso)=curdate()";
-	//local
 	$fecha_actual = date("Y-m-d"); 
-	$sql="SELECT IFNULL(SUM(total_venta),0) as total_venta FROM venta WHERE DATE(fecha_hora)='$fecha_actual' AND estado='aceptado' ";
+	$sql="SELECT IFNULL(SUM(total_venta),0) as total_venta FROM venta WHERE DATE(fecha_hora)='$fecha_actual' AND estado='Aceptado' ";
 	return ejecutarConsulta($sql);
 }
 

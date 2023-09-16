@@ -26,7 +26,27 @@ public function insertar($idcliente,$idusuario,$tipo_comprobante,$serie_comproba
 	 }
 	 return $sw;
 }
+public function editar($idventa,$idcliente,$idusuario,$tipo_comprobante,$serie_comprobante,$num_comprobante,
+$fecha_hora,$impuesto,$total_venta,$idarticulo,$cantidad,$precio_venta,$descuento){
+	$sql="UPDATE venta SET idcliente='$idcliente',idusuario='$idusuario',tipo_comprobante='$tipo_comprobante',
+	serie_comprobante='$serie_comprobante',num_comprobante='$num_comprobante',fecha_hora='$fecha_hora',
+	impuesto='$impuesto',total_venta='$total_venta',estado='Aceptado' WHERE idventa='$idventa'";
+	//return ejecutarConsulta($sql);
+	 ejecutarConsulta($sql);
+	 $sql2="DELETE FROM detalle_venta WHERE idventa ='$idventa'";
+	 ejecutarConsulta($sql2);
+	 $num_elementos=0;
+	 $sw=true;
+	 while ($num_elementos < count($idarticulo)) {
 
+	 	$sql_detalle="INSERT INTO detalle_venta (idventa,idarticulo,cantidad,precio_venta,descuento) VALUES('$idventa','$idarticulo[$num_elementos]','$cantidad[$num_elementos]','$precio_venta[$num_elementos]','$descuento[$num_elementos]')";
+
+	 	ejecutarConsulta($sql_detalle) or $sw=false;
+
+	 	$num_elementos=$num_elementos+1;
+	 }
+	 return $sw;
+}
 public function anular($idventa){
 	$sql="UPDATE venta SET estado='Anulado' WHERE idventa='$idventa'";
 	return ejecutarConsulta($sql);
@@ -40,7 +60,9 @@ public function mostrar($idventa){
 }
 
 public function listarDetalle($idventa){
-	$sql="SELECT dv.idventa,dv.idarticulo,a.nombre,dv.cantidad,dv.precio_venta,dv.descuento,(dv.cantidad*dv.precio_venta-dv.descuento) as subtotal FROM detalle_venta dv INNER JOIN articulo a ON dv.idarticulo=a.idarticulo WHERE dv.idventa='$idventa'";
+	$sql="SELECT dv.idventa,dv.idarticulo,a.nombre,dv.cantidad,dv.precio_venta,
+	dv.descuento,(dv.cantidad*dv.precio_venta-dv.descuento) as subtotal FROM detalle_venta dv
+	 INNER JOIN articulo a ON dv.idarticulo=a.idarticulo WHERE dv.idventa='$idventa'";
 	return ejecutarConsulta($sql);
 } 
  
@@ -73,7 +95,7 @@ public function ventacabecera($idventa){
 // }
 
 public function ventadetalles($idventa){
-	$sql="SELECT a.nombre AS articulo, a.codigo,a.idarticulo as id_articulo, d.cantidad, d.precio_venta, d.descuento, (d.cantidad*d.precio_venta-d.descuento) AS subtotal FROM detalle_venta d INNER JOIN articulo a ON d.idarticulo=a.idarticulo WHERE d.idventa='$idventa'";
+	$sql="SELECT a.nombre AS articulo, a.codigo,d.idarticulo as idart, d.cantidad, d.precio_venta, d.descuento, (d.cantidad*d.precio_venta-d.descuento) AS subtotal FROM detalle_venta d INNER JOIN articulo a ON d.idarticulo=a.idarticulo WHERE d.idventa='$idventa'";
          return ejecutarConsulta($sql);
 }
 // public function ventadetalles($idventa){

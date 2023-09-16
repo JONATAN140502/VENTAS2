@@ -25,7 +25,7 @@ function limpiar(){
 	$("#serie_comprobante").val("");
 	$("#num_comprobante").val("");
 	$("#impuesto").val("");
-
+    $("#idingreso").val("");
 	$("#total_compra").val("");
 	$(".filas").remove();
 	$("#total").html("0");
@@ -122,7 +122,7 @@ function listarArticulos(){
 	}).DataTable();
 }
 //funcion para guardaryeditar
-function guardaryeditar(e){
+function guardaryeditar(e){	
      e.preventDefault();//no se activara la accion predeterminada 
      //$("#btnGuardar").prop("disabled",true);
      var formData=new FormData($("#formulario")[0]);
@@ -137,11 +137,10 @@ function guardaryeditar(e){
      	success: function(datos){
      		bootbox.alert(datos);
      		mostrarform(false);
-     		listar();
+			limpiar();
+			listar();
      	}
      });
-
-     limpiar();
 }
 
 function mostrar(idingreso){
@@ -228,6 +227,52 @@ function agregarDetalle(idarticulo,articulo){
 		alert("error al ingresar el detalle, revisar las datos del articulo ");
 	}
 }
+
+function editar(idingreso) {
+	$.post("../ajax/ingreso.php?op=mostrar",{idingreso : idingreso},
+		function(data,status)
+		{
+			data=JSON.parse(data);
+			mostrarform(true);
+
+			$("#idproveedor").val(data.idproveedor);
+			$("#idproveedor").selectpicker('refresh');
+			$("#tipo_comprobante").val(data.tipo_comprobante);
+			$("#tipo_comprobante").selectpicker('refresh');
+			$("#serie_comprobante").val(data.serie_comprobante);
+			$("#num_comprobante").val(data.num_comprobante);
+			$("#fecha_hora").val(data.fecha);
+			$("#impuesto").val(data.impuesto);
+			$("#idingreso").val(data.idingreso);
+			
+			//ocultar y mostrar los botones
+			$("#btnGuardar").show();
+			$("#btnCancelar").show();
+			$("#btnAgregarArt").show();
+		});
+	$.post("../ajax/ingreso.php?op=listarDetalleEditar&id=" + idingreso, function (data, status) {
+	  var detallesData = JSON.parse(data);
+	  console.log(detallesData);
+	  // Limpiar la tabla de detalles
+  
+	  // Recorrer los datos y construir las filas de la tabla detalle
+	  detallesData.forEach(function (detalle, index) {
+		var fila = '<tr class="filas" id="fila' + index + '">' +
+		  '<td><button type="button" class="btn btn-danger" onclick="eliminarDetalle(' + index + ')">X</button></td>' +
+		  '<td><input type="hidden" name="idarticulo[]" value="' + detalle[0] + '">' + detalle[1] + '</td>' +
+		  '<td><input type="number" name="cantidad[]" id="cantidad[]" value="' + detalle[2] + '"></td>' +
+		  '<td><input type="text" name="precio_compra[]" id="precio_compra[]" value="' + detalle[3] + '"></td>' +
+		  '<td><input type="text" name="precio_venta[]" value="' + detalle[4] + '"></td>' +
+		  '<td><span id="subtotal' + index + '" name="subtotal">' + detalle[5] + '</span></td>' +
+		  '<td><button type="button" onclick="modificarSubtotales()" class="btn btn-info"><i class="fa fa-refresh"></i></button></td>' +
+		  '</tr>';
+		$("#detalles").append(fila);
+		detalles ++;
+	  });
+  
+	  modificarSubtotales();
+	});
+  }
 
 function modificarSubtotales(){
 	var cant=document.getElementsByName("cantidad[]");

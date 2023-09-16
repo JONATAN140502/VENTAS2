@@ -21,11 +21,11 @@ function init(){
 function limpiar(){
 
 	$("#idcliente").val("");
+	$("#idventa").val("");
 	$("#cliente").val("");
 	$("#serie_comprobante").val("0001");
 	$("#num_comprobante").val("");
 	$("#impuesto").val("18");
-
 	$("#total_venta").val("");
 	$(".filas").remove();
 	$("#total").html("0");
@@ -81,6 +81,7 @@ function llenarcomprobante(tipo){
 
 //funcion listar
 function listar(){
+	
 	tabla=$('#tbllistado').dataTable({
 		"aProcessing": true,//activamos el procedimiento del datatable
 		"aServerSide": true,//paginacion y filrado realizados por el server
@@ -104,6 +105,7 @@ function listar(){
 		"iDisplayLength":5,//paginacion
 		"order":[[0,"desc"]]//ordenar (columna, orden)
 	}).DataTable();
+	limpiar();
 }
 
 function listarArticulos(){
@@ -144,6 +146,7 @@ function guardaryeditar(e){
      	success: function(datos){
      		bootbox.alert(datos);
      		mostrarform(false);
+
      		listar();
      	}
      });
@@ -178,54 +181,6 @@ function mostrar(idventa){
 	});
 
 }
-function editar(idventa) {
-	$.post("../ajax/venta.php?op=mostrar", { idventa: idventa }, function (data, status) {
-	  data = JSON.parse(data);
-	  mostrarform(true);
-	  console.log("editar");
-  
-	  // Llenar los campos de encabezado
-	  $("#idcliente").val(data.idcliente);
-	  $("#idcliente").selectpicker('refresh');
-	  $("#tipo_comprobante").val(data.tipo_comprobante);
-	  $("#tipo_comprobante").selectpicker('refresh');
-	  $("#serie_comprobante").val(data.serie_comprobante);
-	  $("#num_comprobante").val(data.num_comprobante);
-	  $("#fecha_hora").val(data.fecha);
-	  $("#impuesto").val(data.impuesto);
-	  $("#idventa").val(data.idventa);
-  
-	  // Ocultar y mostrar los botones
-	  $("#btnGuardar").hide();
-	  $("#btnCancelar").show();
-	  $("#btnAgregarArt").hide();
-	});
-  
-	$.post("../ajax/venta.php?op=listarDetalleEditar&id=" + idventa, function (data, status) {
-	  var detallesData = JSON.parse(data);
-	  console.log(detallesData);
-	  // Limpiar la tabla de detalles
-	  $("#detalles tbody").empty();
-  
-	  // Recorrer los datos y construir las filas de la tabla detalle
-	  detallesData.forEach(function (detalle, index) {
-		var fila = '<tr class="filas" id="fila' + index + '">' +
-		  '<td><button type="button" class="btn btn-danger" onclick="eliminarDetalle(' + index + ')">X</button></td>' +
-		  '<td><input type="hidden" name="idarticulo[]" value="' + detalle[0] + '">' + detalle[1] + '</td>' +
-		  '<td><input type="number" name="cantidad[]" id="cantidad[]" value="' + detalle[2] + '"></td>' +
-		  '<td><input type="text" name="precio_venta[]" id="precio_venta[]" value="' + detalle[3] + '"></td>' +
-		  '<td><input type="text" name="descuento[]" value="' + detalle[4] + '"></td>' +
-		  '<td><span id="subtotal' + index + '" name="subtotal">' + detalle[5] + '</span></td>' +
-		  '<td><button type="button" onclick="modificarSubtotales()" class="btn btn-info"><i class="fa fa-refresh"></i></button></td>' +
-		  '</tr>';
-		$("#detalles tbody").append(fila);
-	  });
-  
-	  modificarSubtotales();
-	});
-  }
-  
-
 //funcion para desactivar
 function anular(idventa){
 	bootbox.confirm("¿Esta seguro de desactivar este dato?", function(result){
@@ -282,7 +237,52 @@ function agregarDetalle(idarticulo,articulo,precio_venta){
 		alert("error al ingresar el detalle, revisar las datos del articulo ");
 	}
 }
-
+function editar(idventa) {
+	$.post("../ajax/venta.php?op=mostrar", { idventa: idventa }, function (data, status) {
+	  data = JSON.parse(data);
+	  mostrarform(true);
+	  console.log("editar");
+  
+	  // Llenar los campos de encabezado
+	  $("#idcliente").val(data.idcliente);
+	  $("#idcliente").selectpicker('refresh');
+	  $("#tipo_comprobante").val(data.tipo_comprobante);
+	  $("#tipo_comprobante").selectpicker('refresh');
+	  $("#serie_comprobante").val(data.serie_comprobante);
+	  $("#num_comprobante").val(data.num_comprobante);
+	  $("#fecha_hora").val(data.fecha);
+	  $("#impuesto").val(data.impuesto);
+	  $("#idventa").val(data.idventa);
+  
+	  // Ocultar y mostrar los botones
+	  $("#btnGuardar").show();
+	  $("#btnCancelar").show();
+	  $("#btnAgregarArt").show();
+	});
+  
+	$.post("../ajax/venta.php?op=listarDetalleEditar&id=" + idventa, function (data, status) {
+	  var detallesData = JSON.parse(data);
+	  console.log(detallesData);
+	  // Limpiar la tabla de detalles
+  
+	  // Recorrer los datos y construir las filas de la tabla detalle
+	  detallesData.forEach(function (detalle, index) {
+		var fila = '<tr class="filas" id="fila' + index + '">' +
+		  '<td><button type="button" class="btn btn-danger" onclick="eliminarDetalle(' + index + ')">X</button></td>' +
+		  '<td><input type="hidden" name="idarticulo[]" value="' + detalle[0] + '">' + detalle[1] + '</td>' +
+		  '<td><input type="number" name="cantidad[]" id="cantidad[]" value="' + detalle[2] + '"></td>' +
+		  '<td><input type="text" name="precio_venta[]" id="precio_venta[]" value="' + detalle[3] + '"></td>' +
+		  '<td><input type="text" name="descuento[]" value="' + detalle[4] + '"></td>' +
+		  '<td><span id="subtotal' + index + '" name="subtotal">' + detalle[5] + '</span></td>' +
+		  '<td><button type="button" onclick="modificarSubtotales()" class="btn btn-info"><i class="fa fa-refresh"></i></button></td>' +
+		  '</tr>';
+		$("#detalles").append(fila);
+		detalles ++;
+	  });
+  
+	  modificarSubtotales();
+	});
+  }
 function modificarSubtotales(){
 	var cant=document.getElementsByName("cantidad[]");
 	var prev=document.getElementsByName("precio_venta[]");

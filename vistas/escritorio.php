@@ -14,7 +14,7 @@ if ($_SESSION['escritorio']==1) {
   require_once "../modelos/Consultas.php";
   $consulta = new Consultas();
   $rsptac = $consulta->totalcomprahoy();
-  $regc=$rsptac->fetch_object();
+  $regc=$rsptac->fetch_object(); 
   $totalc=$regc->total_compra;
 
   $rsptav = $consulta->totalventahoy();
