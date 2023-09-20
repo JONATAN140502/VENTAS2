@@ -31,19 +31,63 @@ $fecha_hora,$impuesto,$total_venta,$idarticulo,$cantidad,$precio_venta,$descuent
 	$sql="UPDATE venta SET idcliente='$idcliente',idusuario='$idusuario',tipo_comprobante='$tipo_comprobante',
 	serie_comprobante='$serie_comprobante',num_comprobante='$num_comprobante',fecha_hora='$fecha_hora',
 	impuesto='$impuesto',total_venta='$total_venta',estado='Aceptado' WHERE idventa='$idventa'";
-	//return ejecutarConsulta($sql);
 	 ejecutarConsulta($sql);
-	 $sql2="DELETE FROM detalle_venta WHERE idventa ='$idventa'";
-	 ejecutarConsulta($sql2);
 	 $num_elementos=0;
 	 $sw=true;
 	 while ($num_elementos < count($idarticulo)) {
+		$sql1="SELECT * FROM detalle_venta WHERE idventa='$idventa'AND 
+		idarticulo='$idarticulo[$num_elementos]'";
+		$fila1=ejecutarConsultaSimpleFila($sql1);
+		if (isset($fila1['idarticulo']) && !empty($fila1['idarticulo'])) { 
+		$idarticulo1 = $fila1['idarticulo'];
+		$cantidad1 = $fila1['cantidad'];
+		$precioventa1 = $fila1['precio_venta'];
+	  if($cantidad[$num_elementos]==$fila1['cantidad']){
+		  $sql_actualizacion = "UPDATE detalle_venta 
+		  SET cantidad = '$cantidad[$num_elementos]', 
+			  precio_venta = '$precio_venta[$num_elementos]', 
+			  descuento = '$descuento[$num_elementos]' 
+		  WHERE idventa = '$idventa' AND idarticulo = '$idarticulo[$num_elementos]'";
+		   ejecutarConsulta($sql_actualizacion) or $sw=false;
+	  }
+	 if($cantidad[$num_elementos]>$fila1['cantidad']){
+	 $sql2="SELECT articulo.stock   from articulo where idarticulo='$idarticulo[$num_elementos]'";
+	 $fila2=ejecutarConsultaSimpleFila($sql2);
+	  $nuevostock=$cantidad[$num_elementos]-$fila1['cantidad'];
+	  $stockfinal=$fila2['stock']-$nuevostock;
+      $sql3="UPDATE articulo SET stock = '$stockfinal' WHERE idarticulo='$idarticulo[$num_elementos]'";
+        ejecutarConsulta($sql3);
+        $sql_actualizacion2 = "UPDATE detalle_venta 
+          SET cantidad = '$cantidad[$num_elementos]', 
+	    precio_venta = '$precio_venta[$num_elementos]', 
+	     descuento = '$descuento[$num_elementos]' 
+          WHERE idventa = '$idventa' AND idarticulo = '$idarticulo[$num_elementos]'";
+          ejecutarConsulta($sql_actualizacion2) or $sw=false;
 
-	 	$sql_detalle="INSERT INTO detalle_venta (idventa,idarticulo,cantidad,precio_venta,descuento) VALUES('$idventa','$idarticulo[$num_elementos]','$cantidad[$num_elementos]','$precio_venta[$num_elementos]','$descuento[$num_elementos]')";
+}
+ if($cantidad[$num_elementos]<$fila1['cantidad'])
+{
+	$sql4="SELECT articulo.stock   from articulo where idarticulo='$idarticulo[$num_elementos]'";
+	$fila4=ejecutarConsultaSimpleFila($sql4);
+	 $nuevostock=$fila1['cantidad']-$cantidad[$num_elementos];
+	 $stockfinal=$fila4['stock']+$nuevostock;
+  $sql4="UPDATE articulo SET stock = '$stockfinal' WHERE idarticulo='$idarticulo[$num_elementos]'";
+  ejecutarConsulta($sql4);
+  $sql_actualizacion3 = "UPDATE detalle_venta 
+  SET cantidad = '$cantidad[$num_elementos]', 
+	  precio_venta = '$precio_venta[$num_elementos]', 
+	  descuento = '$descuento[$num_elementos]' 
+  WHERE idventa = '$idventa' AND idarticulo = '$idarticulo[$num_elementos]'";
+   ejecutarConsulta($sql_actualizacion3) or $sw=false;
 
-	 	ejecutarConsulta($sql_detalle) or $sw=false;
-
-	 	$num_elementos=$num_elementos+1;
+}}
+else{
+	$sql_detalle="INSERT INTO detalle_venta (idventa,idarticulo,cantidad,precio_venta,descuento)
+	 VALUES('$idventa','$idarticulo[$num_elementos]','$cantidad[$num_elementos]','
+	 $precio_venta[$num_elementos]','$descuento[$num_elementos]')";
+ejecutarConsulta($sql_detalle) or $sw=false;
+}
+  $num_elementos=$num_elementos+1;
 	 }
 	 return $sw;
 }

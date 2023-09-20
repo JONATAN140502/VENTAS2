@@ -187,7 +187,8 @@ function anular(idventa){
 		if (result) {
 			$.post("../ajax/venta.php?op=anular", {idventa : idventa}, function(e){
 				bootbox.alert(e);
-				tabla.ajax.reload();
+				listar();
+				//tabla.ajax.reload();
 			});
 		}
 	})

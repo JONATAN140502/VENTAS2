@@ -35,6 +35,8 @@ if ($_SESSION['almacen']==1) {
       <th>Stock</th>
       <th>Imagen</th>
       <th>Descripcion</th>
+      <th>Precio Compra</th>
+      <th>Precio Venta</th>
       <th>Estado</th>
     </thead>
     <tbody>
@@ -47,6 +49,8 @@ if ($_SESSION['almacen']==1) {
       <th>Stock</th>
       <th>Imagen</th>
       <th>Descripcion</th>
+      <th>Precio Compra</th>
+      <th>Precio Venta</th>
       <th>Estado</th>
     </tfoot>   
   </table>

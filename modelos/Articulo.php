@@ -38,13 +38,24 @@ public function mostrar($idarticulo){
 
 //listar registros 
 public function listar(){
-	$sql="SELECT a.idarticulo,a.idcategoria,c.nombre as categoria,a.codigo, a.nombre,a.stock,a.descripcion,a.imagen,a.condicion FROM articulo a INNER JOIN categoria c ON a.idcategoria=c.idcategoria";
+	// $sql="SELECT a.idarticulo,a.idcategoria,c.nombre as categoria,a.codigo, a.nombre,a.stock,
+    // a.descripcion,a.imagen,a.condicion FROM articulo a INNER JOIN categoria c ON
+    //  a.idcategoria=c.idcategoria";
+    $sql="SELECT a.idarticulo,a.idcategoria,c.nombre as categoria,a.codigo, a.nombre,a.stock,
+    (SELECT precio_venta FROM detalle_ingreso WHERE idarticulo=a.idarticulo ORDER BY iddetalle_ingreso DESC LIMIT 0,1) 
+    AS precio_venta,
+    (SELECT precio_compra FROM detalle_ingreso WHERE idarticulo=a.idarticulo ORDER BY iddetalle_ingreso DESC LIMIT 0,1) 
+    AS precio_compra,
+    a.descripcion,a.imagen,a.condicion FROM articulo a 
+    INNER JOIN categoria c ON a.idcategoria=c.idcategoria";
 	return ejecutarConsulta($sql);
 }
 
 //listar registros activos
 public function listarActivos(){
-	$sql="SELECT a.idarticulo,a.idcategoria,c.nombre as categoria,a.codigo, a.nombre,a.stock,a.descripcion,a.imagen,a.condicion FROM articulo a INNER JOIN categoria c ON a.idcategoria=c.idcategoria WHERE a.condicion='1'";
+	$sql="SELECT a.idarticulo,a.idcategoria,c.nombre as categoria,a.codigo, a.nombre,a.stock,
+    a.descripcion,a.imagen,a.condicion FROM articulo a INNER JOIN categoria c ON
+     a.idcategoria=c.idcategoria WHERE a.condicion='1'";
 	return ejecutarConsulta($sql);
 }
 

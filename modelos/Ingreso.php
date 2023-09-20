@@ -26,26 +26,71 @@ public function insertar($idproveedor,$idusuario,$tipo_comprobante,$serie_compro
 	 }
 	 return $sw;
 }
-//metodo insertar registro
-public function editar($idingreso,$idproveedor,$idusuario,$tipo_comprobante,$serie_comprobante,$num_comprobante,$fecha_hora,$impuesto,$total_compra,$idarticulo,$cantidad,$precio_compra,$precio_venta){
-	$sql="UPDATE ingreso  SET idproveedor='$idproveedor',idusuario='$idusuario',
-	tipo_comprobante='$tipo_comprobante' ,serie_comprobante='$serie_comprobante' ,
-	num_comprobante='$num_comprobante' ,fecha_hora='$fecha_hora' ,impuesto='$impuesto' 
-	,total_compra='$total_compra' ,estado='Aceptado' WHERE idingreso='$idingreso'";
-	//return ejecutarConsulta($sql);
+
+public function editar($idingreso,$idproveedor,$idusuario,$tipo_comprobante,$serie_comprobante,
+$num_comprobante,$fecha_hora,$impuesto,$total_compra,$idarticulo,$cantidad,$precio_compra,$precio_venta){
+	 	$sql="UPDATE ingreso  SET idproveedor='$idproveedor',idusuario='$idusuario',
+		tipo_comprobante='$tipo_comprobante' ,serie_comprobante='$serie_comprobante' ,
+	 	num_comprobante='$num_comprobante' ,fecha_hora='$fecha_hora' ,impuesto='$impuesto' 
+		,total_compra='$total_compra' ,estado='Aceptado' WHERE idingreso='$idingreso'";
 	 ejecutarConsulta($sql);
-	 $sql2=" DELETE FROM detalle_ingreso WHERE idingreso='$idingreso'";
-	 ejecutarConsulta($sql2);
 	 $num_elementos=0;
 	 $sw=true;
 	 while ($num_elementos < count($idarticulo)) {
+		$sql1="SELECT * FROM detalle_ingreso WHERE idingreso='$idingreso'AND 
+		idarticulo='$idarticulo[$num_elementos]'";
+		$fila1=ejecutarConsultaSimpleFila($sql1);
+		if (isset($fila1['idarticulo']) && !empty($fila1['idarticulo'])) { 
+		$idarticulo1 = $fila1['idarticulo'];
+		$cantidad1 = $fila1['cantidad'];
+		$preciocompra1 = $fila1['precio_compra'];
+		$precioventa1 = $fila1['precio_venta'];
+	  if($cantidad[$num_elementos]==$fila1['cantidad']){
+		  $sql_actualizacion = "UPDATE detalle_ingreso 
+		  SET cantidad = '$cantidad[$num_elementos]', 
+			  precio_venta = '$precio_venta[$num_elementos]', 
+			  precio_compra = '$precio_compra[$num_elementos]'		 
+		  WHERE idingreso = '$idingreso' AND idarticulo = '$idarticulo[$num_elementos]'";
+		   ejecutarConsulta($sql_actualizacion) or $sw=false;
+	  }
+	 if($cantidad[$num_elementos]>$fila1['cantidad']){
+	 $sql2="SELECT articulo.stock   from articulo where idarticulo='$idarticulo[$num_elementos]'";
+	 $fila2=ejecutarConsultaSimpleFila($sql2);
+	  $nuevostock=$cantidad[$num_elementos]-$fila1['cantidad'];
+	  $stockfinal=$fila2['stock']+$nuevostock;
+      $sql3="UPDATE articulo SET stock = '$stockfinal' WHERE idarticulo='$idarticulo[$num_elementos]'";
+        ejecutarConsulta($sql3);
+        $sql_actualizacion2 = "UPDATE detalle_ingreso 
+		SET cantidad = '$cantidad[$num_elementos]', 
+			precio_venta = '$precio_venta[$num_elementos]', 
+			precio_compra = '$precio_compra[$num_elementos]'		 
+		WHERE idingreso = '$idingreso' AND idarticulo = '$idarticulo[$num_elementos]'";
+          ejecutarConsulta($sql_actualizacion2) or $sw=false;
 
-	 	$sql_detalle="INSERT INTO detalle_ingreso (idingreso,idarticulo,cantidad,precio_compra,precio_venta)
-		 VALUES('$idingreso','$idarticulo[$num_elementos]','$cantidad[$num_elementos]','$precio_compra[$num_elementos]','$precio_venta[$num_elementos]')";
+}
+ if($cantidad[$num_elementos]<$fila1['cantidad'])
+{
+	$sql4="SELECT articulo.stock   from articulo where idarticulo='$idarticulo[$num_elementos]'";
+	$fila4=ejecutarConsultaSimpleFila($sql4);
+	 $nuevostock=$fila1['cantidad']-$cantidad[$num_elementos];
+	 $stockfinal=$fila4['stock']-$nuevostock;
+  $sql4="UPDATE articulo SET stock = '$stockfinal' WHERE idarticulo='$idarticulo[$num_elementos]'";
+  ejecutarConsulta($sql4);
+  $sql_actualizacion3 = "UPDATE detalle_ingreso 
+  SET cantidad = '$cantidad[$num_elementos]', 
+	  precio_venta = '$precio_venta[$num_elementos]', 
+	  precio_compra = '$precio_compra[$num_elementos]'		 
+  WHERE idingreso = '$idingreso' AND idarticulo = '$idarticulo[$num_elementos]'";
+   ejecutarConsulta($sql_actualizacion3) or $sw=false;
 
-	 	ejecutarConsulta($sql_detalle) or $sw=false;
-
-	 	$num_elementos=$num_elementos+1;
+}}
+else{
+	$sql_detalle="INSERT INTO detalle_ingreso (idingreso,idarticulo,cantidad,precio_compra,precio_venta)
+		 VALUES('$idingreso','$idarticulo[$num_elementos]','$cantidad[$num_elementos]',
+      '$precio_compra[$num_elementos]','$precio_venta[$num_elementos]')";
+	ejecutarConsulta($sql_detalle) or $sw=false;
+}
+  $num_elementos=$num_elementos+1;
 	 }
 	 return $sw;
 }
